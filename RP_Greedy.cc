@@ -14,7 +14,7 @@ unsigned ManhattanDistance (point p1, point p2)
 }
 
 
-point PlaceRandomizedRouter(const RP_Input& in, RP_Output& out)
+void PlaceRandomizedRouter(const RP_Input& in, RP_Output& out)
 {
     unsigned r, c;
     unsigned attempts = 0;
@@ -24,16 +24,13 @@ point PlaceRandomizedRouter(const RP_Input& in, RP_Output& out)
 
     while (attempts < MAX_ATTEMPTS)
     {
-        for (int i = 0; i < 1000; i++)
+        do
         {
-            do
-            {
-                r = Random(0, in.Rows()-1);
-                c = Random(0, in.Columns()-1);
-                selected.row = r;
-                selected.col = c;
-            } while (!in.IsDot(r, c) || (in.RouterPrice() + (ManhattanDistance(selected, ClosestBackbonePoint(out, in, selected)) * in.BackbonePrice()) >= out.RemainingBudget()));
-        }
+            r = Random(0, in.Rows()-1);
+            c = Random(0, in.Columns()-1);
+            selected.row = r;
+            selected.col = c;
+        } while (!in.IsDot(r, c) || (in.RouterPrice() + (ManhattanDistance(selected, ClosestBackbonePoint(out, in, selected)) * in.BackbonePrice()) >= out.RemainingBudget()));
         
         if (out.CellDegree(selected).size() > max_coverage)
         {
@@ -46,10 +43,8 @@ point PlaceRandomizedRouter(const RP_Input& in, RP_Output& out)
 
     out.InsertRouter(max_coverage_found.row, max_coverage_found.col);
 
-    unsigned total = out.TotalCoveredPoints();
-    cout << "TotalCovered: " << total << endl;
 
-    return selected;
+    cout << "Covered: " << out.TotalCoveredPoints() << endl;
 }
 
 
@@ -173,7 +168,7 @@ void GreedyRP(const RP_Input& in, RP_Output& out)
         score = out.ComputeScore();
         if (out.RemainingBudget() >= int(in.RouterPrice()))
         {
-            router = PlaceRandomizedRouter(in, out);
+            PlaceRandomizedRouter(in, out);
             // cout << "Remaining Budget: "  << out.RemainingBudget() << endl;
 
             ConnectRouterWithBackbone(out, in, router);
