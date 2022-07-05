@@ -16,7 +16,6 @@ unsigned ManhattanDistance (point p1, point p2)
 
 void PlaceRandomizedRouter(const RP_Input& in, RP_Output& out)
 {
-    unsigned r, c;
     unsigned attempts = 0;
     unsigned max_coverage = 0;
     const unsigned MAX_ATTEMPTS = 10000;
@@ -26,11 +25,9 @@ void PlaceRandomizedRouter(const RP_Input& in, RP_Output& out)
     {
         do
         {
-            r = Random(0, in.Rows()-1);
-            c = Random(0, in.Columns()-1);
-            selected.row = r;
-            selected.col = c;
-        } while (!in.IsDot(r, c) || (in.RouterPrice() + (ManhattanDistance(selected, ClosestBackbonePoint(out, in, selected)) * in.BackbonePrice()) >= out.RemainingBudget()));
+            selected.row = Random(0, in.Rows()-1);
+            selected.col = Random(0, in.Columns()-1);
+        } while (!in.IsDot(selected.row, selected.col) || (in.RouterPrice() + (ManhattanDistance(selected, ClosestBackbonePoint(out, in, selected)) * in.BackbonePrice()) >= out.RemainingBudget()));
         
         if (out.CellDegree(selected).size() > max_coverage)
         {
@@ -42,8 +39,6 @@ void PlaceRandomizedRouter(const RP_Input& in, RP_Output& out)
     }
 
     out.InsertRouter(max_coverage_found.row, max_coverage_found.col);
-
-
     cout << "Covered: " << out.TotalCoveredPoints() << endl;
 }
 
